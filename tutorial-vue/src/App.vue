@@ -1,47 +1,95 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div id="app" class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Personas</h1>
+      </div>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <div class="row">
+      <div class="col-md-12">
+        <formulario-persona @add-persona="agregarPersona"/>
+        <div v-if="!personas.length" class="alert alert-info" role="alert">
+          No se han encontrado personas :(
+        </div>
+        <div v-else>
+          <tabla-personas :personas="personas" @delete-persona="eliminarPersona" @actualizar-persona="actualizarPersona"/>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
+<script setup>
+  //importacion del componente TablaPersonas
+  import TablaPersonas from '@/components/TablaPersonas.vue'
+  import FormularioPersona from '@/components/FormularioPersona.vue';
+  import { ref } from 'vue';
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+  //Definicion del componente Vue
+  defineOptions({
+    //Nombre del componente
+    name: 'app',
+  });
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+  const personas = ref([
+    {
+      id: 1,
+      nombre: 'Jon',
+      apellido: 'Nieve',
+      email: 'jon@email.com',
+    },
+    {
+      id: 2,
+      nombre: 'Tyrion',
+      apellido: 'Lannister',
+      email: 'tyrion@email.com',
+    },
+    {
+      id: 3,
+      nombre: 'Daenerys',
+      apellido: 'Targaryen',
+      email: 'daenerys@email.com'
+    },
+  ]);
+
+  const agregarPersona = (persona) => {
+    let id = 0;
+
+    if (personas.value.length > 0){
+      id = personas.value[personas.value.length - 1].id + 1;
+    }
+
+    personas.value = [...personas.value, {...persona, id}];
+  };
+
+  const eliminarPersona = (id) => {
+    try {
+      personas.value = personas.value.filter(u => u.id !== id);
+    }
+    catch (error){
+      console.error(error)
+    }
+  };
+
+  const actualizarPersona = (id, personaActualizada) => {
+    try {
+      personas.value = personas.value.map(persona => 
+        persona.id === id ? personaActualizada : persona);
+    }
+
+    catch (error){
+      console.error(error);
+    }
+  };
+
+  const props = defineProps({
+    personas : {type: Array, default: []},
+  }); 
+</script>
+
+<style>
+  button {
+    background: #009435;
+    border: 1px solid #009435;
   }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
 </style>
