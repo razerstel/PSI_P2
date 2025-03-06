@@ -8,14 +8,17 @@
     <div class="row">
       <div class="col-md-12">
         <formulario-persona @add-persona="agregarPersona"/>
-        <div v-if="!personas.length" class="alert alert-info" role="alert">
+        <div id="tabla-personas" v-if="!personas.length" class="alert alert-info" role="alert" data-cy="no-persona">
           No se han encontrado personas :(
         </div>
-        <div v-else>
+        <div id="tabla-personas">
           <tabla-personas :personas="personas" @delete-persona="eliminarPersona" @actualizar-persona="actualizarPersona"/>
         </div>
       </div>
     </div>
+  </div>
+  <div>
+    <p>Count is {{ store.count }}</p>
   </div>
 </template>
 
@@ -23,7 +26,8 @@
   //importacion del componente TablaPersonas
   import TablaPersonas from '@/components/TablaPersonas.vue'
   import FormularioPersona from '@/components/FormularioPersona.vue';
-  import { ref } from 'vue';
+  import { ref, onMounted} from 'vue';
+  import { useCounterStore } from './stores/counter';
 
   //Definicion del componente Vue
   defineOptions({
@@ -31,56 +35,84 @@
     name: 'app',
   });
 
-  const personas = ref([
-    {
-      id: 1,
-      nombre: 'Jon',
-      apellido: 'Nieve',
-      email: 'jon@email.com',
-    },
-    {
-      id: 2,
-      nombre: 'Tyrion',
-      apellido: 'Lannister',
-      email: 'tyrion@email.com',
-    },
-    {
-      id: 3,
-      nombre: 'Daenerys',
-      apellido: 'Targaryen',
-      email: 'daenerys@email.com'
-    },
-  ]);
+  const personas = ref([]);
+  const store = useCounterStore();
 
-  const agregarPersona = (persona) => {
-    let id = 0;
-
-    if (personas.value.length > 0){
-      id = personas.value[personas.value.length - 1].id + 1;
+  const listadoPersonas = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/personas/');
+      personas.value = await response.json()
+    }
+    catch (error){
+      console.error(error)
     }
 
-    personas.value = [...personas.value, {...persona, id}];
   };
 
-  const eliminarPersona = (id) => {
+  const agregarPersona = async (persona) => {
+
     try {
-      personas.value = personas.value.filter(u => u.id !== id);
+
+      const response = await fetch(
+        'http://localhost:8000/api/v1/personas/',
+        {
+          method: 'POST',
+          body: JSON.stringify(persona),
+          headers: {'Content-type' : 'application/json; charset=UTF-8'},
+        }
+      );
+
+      const personaCreada = await response.json()
+      personas.value = [...personas.value, personaCreada]
+      store.increment()
+    }
+    catch (error) {
+      console.error(error)
+    }
+    
+  };
+
+  const eliminarPersona = async (id) => {
+    try {
+      const response = await fetch(
+        'http://localhost:8000/api/v1/personas/'+id+'/',
+        {
+          method: 'DELETE',
+        }
+      );
+
+      personas.value = personas.value.filter(u => u.id !== id)
     }
     catch (error){
       console.error(error)
     }
   };
 
-  const actualizarPersona = (id, personaActualizada) => {
+  const actualizarPersona = async (id, personaActualizada) => {
     try {
-      personas.value = personas.value.map(persona => 
-        persona.id === id ? personaActualizada : persona);
+      const response = await fetch(
+        'http://localhost:8000/api/v1/personas/'+personaActualizada.id+'/',
+        {
+          method: 'PUT',
+          body: JSON.stringify(personaActualizada),
+          headers: {'Content-type' : 'application/json; charset=UTF-8'},
+        }
+      );
+
+      const personaActualizadaJS = await response.json();
+      personas.value = personas.value.map(
+        u => (u.id === personaActualizada.id ? personaActualizadaJS: u)
+      );
     }
 
     catch (error){
       console.error(error);
     }
   };
+
+  onMounted(() => {
+    listadoPersonas();
+  });
 
   const props = defineProps({
     personas : {type: Array, default: []},
