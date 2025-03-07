@@ -3,6 +3,7 @@
 context('Edit persona', () => {
   beforeEach(() => {
     cy.visit('http://localhost:5173')
+    cy.wait(1000);
   })
 
 
@@ -26,6 +27,7 @@ context('Edit persona', () => {
       cy.get('[data-cy=surname]').type("Land")
       cy.get('[data-cy=email]').type("paco@land.com")
       cy.get('[data-cy=add-button]').click()
+      cy.wait(1000);
       cy.get('div.alert-success')
     })
 
@@ -36,8 +38,10 @@ context('Edit persona', () => {
 
         cy.log('Initial len: ', intialLength)
         cy.get('table').contains('tr', 'Paco1234').find('[data-cy=edit-button]').click()
+        cy.wait(1000);
         cy.get('table').get('[data-cy=persona-nombre]').type("777")
         cy.get('table').get('[data-cy=save-button]').click()
+        cy.wait(1000);
         cy.get('table').contains('tr', 'Paco1234777')
 
 
@@ -53,8 +57,10 @@ context('Edit persona', () => {
 
         cy.log('Initial len: ', intialLength)
         cy.get('table').contains('tr', 'Paco1234').find('[data-cy=edit-button]').click()
+        cy.wait(1000);
         cy.get('table').get('[data-cy=persona-nombre]').type("777")
         cy.get('table').get('[data-cy=cancel-button]').click()
+        cy.wait(1000);
         cy.get('table').contains('tr', 'Paco1234')
 
 
