@@ -11,27 +11,33 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import dj_database_url
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-POSTGRESQL_URL = 'postgresql://alumnodb:alumnodb@localhost:5432/persona'
-
-db_from_env = dj_database_url.config(
-        default= POSTGRESQL_URL, conn_max_age=500
+if "TESTING" in os.environ:
+    db_from_env = dj_database_url.config(
+        default=os.getenv("POSTGRESQL_URL"), conn_max_age=500
     )
+    DEBUG = True
+else:
+    db_from_env = dj_database_url.config(
+        default=os.getenv("NEON_URL"), conn_max_age=500, ssl_require=True
+    )
+    DEBUG = False
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-33kkj6tnscjm^ebmv7t683jupmib&menpj*=7%08ewpz^yav=0"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
