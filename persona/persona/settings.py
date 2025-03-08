@@ -68,6 +68,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:5173',
+    'https://psi-p2-3f32.onrender.com'
 ]
 
 ROOT_URLCONF = "persona.urls"
