@@ -29,6 +29,9 @@
   import { ref, onMounted} from 'vue';
   import { useCounterStore } from './stores/counter';
 
+  const API_URL = import.meta.env.VITE_DJANGOURL;
+
+
   //Definicion del componente Vue
   defineOptions({
     //Nombre del componente
@@ -40,7 +43,7 @@
 
   const listadoPersonas = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/personas/');
+      const response = await fetch(`${API_URL}/api/v1/personas/`);
       personas.value = await response.json()
     }
     catch (error){
@@ -54,7 +57,7 @@
     try {
 
       const response = await fetch(
-        'http://localhost:8000/api/v1/personas/',
+        `${API_URL}/api/v1/personas/`,
         {
           method: 'POST',
           body: JSON.stringify(persona),
@@ -75,7 +78,7 @@
   const eliminarPersona = async (id) => {
     try {
       const response = await fetch(
-        'http://localhost:8000/api/v1/personas/'+id+'/',
+        `${API_URL}/api/v1/personas/`+id+'/',
         {
           method: 'DELETE',
         }
@@ -91,7 +94,7 @@
   const actualizarPersona = async (id, personaActualizada) => {
     try {
       const response = await fetch(
-        'http://localhost:8000/api/v1/personas/'+personaActualizada.id+'/',
+        `${API_URL}/api/v1/personas/`+personaActualizada.id+'/',
         {
           method: 'PUT',
           body: JSON.stringify(personaActualizada),
